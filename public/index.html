@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button onclick="signInG()">Sign in</button>
+
+  <div id="show"></div>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCppLbz-sAnBOZrM39BhGIgX6UAKxxjy_g",
+      authDomain: "home-project-6829a.firebaseapp.com",
+      projectId: "home-project-6829a",
+      storageBucket: "home-project-6829a.appspot.com",
+      messagingSenderId: "277227250699",
+      appId: "1:277227250699:web:15de18db0f3e8599f6530e"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const signInG = () => {
+    signInWithPopup(auth, provider)
+    .then((result) => {
+    const user = result.user;
+    console.log(user);
+    sendEmailVerification(auth.currentUser)
+    .then(() => {
+      console.log('successful');
+      
+    });
+    show.innerHTML += `
+  <h1> Welcome, ${result.user.displayName}</h1>
+  <p>${result.user.email}</p>
+  <img src="${result.user.photoURL}"/>
+  `
+    window.location.href = 'dashboard.html'
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    // ...
+  });
+    }
+    window.signInG = signInG
+
+
+  </script>
+</body>
+</html>

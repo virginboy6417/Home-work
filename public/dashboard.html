@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome Dashboard</h1>
+    <div id="display"></div>
+wor
+   
+<button id="signOutBtn">Sign Out</button> 
+    <br>
+    <input type="text" placeholder="type your chat" id="inputMsg"> 
+    <br>
+    <button id="sendMsg">Send</button>
+
+    <div id="show"></div>
+
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp,  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getDatabase , ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+        apiKey: "AIzaSyCppLbz-sAnBOZrM39BhGIgX6UAKxxjy_g",
+        authDomain: "home-project-6829a.firebaseapp.com",
+        projectId: "home-project-6829a",
+        storageBucket: "home-project-6829a.appspot.com",
+        messagingSenderId: "277227250699",
+        appId: "1:277227250699:web:15de18db0f3e8599f6530e",
+        databaseURL: "https://home-project-6829a-default-rtdb.firebaseio.com"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const database = getDatabase();
+        let homeWorkIndex 
+
+        // All my functions
+        onAuthStateChanged(auth,(user)=>{
+            console.log(user);
+            if (user){
+                display.innerHTML += `
+                <h3> Welcome, ${user.displayName}</h3>
+                <p>${user.email}</p>
+                <img src="${user.photoURL}"/>
+                
+                `
+            }else{
+                console.log('user is not signed in');
+                window.location.href = 'index.html'
+            }
+        })
+
+        signOutBtn.addEventListener('click',()=>{
+            signOut(auth)
+            .then(() => {
+                console.log("signed successful");
+            }).catch((error) => {
+                console.log(error);
+                
+            });
+        })
+        sendMsg.addEventListener('click',()=>{
+            let dbRef = ref(database,`chatStore/${homeWorkIndex}`)
+            let date = new Date()
+            let chat={
+                message : inputMsg.value,
+                time: date.toLocaleTimeString(),
+                username : auth.currentUser.displayName
+            }
+            set(dbRef, chat)
+        })
+
+        
+        // Display information from the database
+        let chatRef = ref(database, "chatStore")
+        onValue(chatRef, (snapshot)=>{
+        show.innerHTML = ''
+        document.getElementById('inputMsg').value = ''
+        let data = snapshot.val()
+        if(data){
+            homeWorkIndex = data.length
+        }else{
+            homeWorkIndex = 0
+        }
+        console.log(data.length);
+        
+        
+        data.map((eachItem)=>{
+            show.innerHTML += `
+            <h1>${eachItem.message}</h1>
+            <i>${eachItem.time}</i>
+            <p>${eachItem.username}</p>
+            `
+        })
+        console.log(data);
+        
+        })
+
+        // work on the database so it does not replace
+
+    </script>
+</body>
+</html>
